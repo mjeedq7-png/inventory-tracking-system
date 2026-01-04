@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allowedTools": {
+      "Bash": {
+        "allowedCommands": [
+          "git status",
+          "git diff",
+          "git log",
+          "git add",
+          "git commit",
+          "git push",
+          "git branch",
+          "git checkout",
+          "npm test",
+          "npm run dev",
+          "npm run build",
+          "npm run lint",
+          "npm run typecheck",
+          "npm run db:migrate",
+          "npx prettier",
+          "ls",
+          "cat",
+          "grep",
+          "curl"
+        ]
+      },
+      "Edit": {
+        "allowed": true
+      },
+      "Read": {
+        "allowed": true
+      }
+    }
+  }
+}
