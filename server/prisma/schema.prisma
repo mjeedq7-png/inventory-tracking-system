@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  PURCHASING
+  OUTLET_CAFE
+  OUTLET_RESTAURANT
+  OUTLET_MINI_MARKET
+}
+
+enum OutletType {
+  CAFE
+  RESTAURANT
+  MINI_MARKET
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      UserRole
+  outletId  String?   @map("outlet_id")
+  outlet    Outlet?   @relation(fields: [outletId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  purchases Purchase[]
+
+  @@map("users")
+}
+
+model Outlet {
+  id        String     @id @default(cuid())
+  name      String
+  type      OutletType
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  users        User[]
+  inventory    Inventory[]
+  sales        Sale[]
+  waste        Waste[]
+  dailyClosing DailyClosing[]
+
+  @@map("outlets")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  unit      String
+  category  String
+  isFixed   Boolean  @default(false) @map("is_fixed")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  inventory Inventory[]
+  purchases Purchase[]
+  sales     Sale[]
+  waste     Waste[]
+
+  @@map("products")
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  outletId  String   @map("outlet_id")
+  outlet    Outlet   @relation(fields: [outletId], references: [id])
+  quantity  Decimal  @db.Decimal(10, 2)
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([productId, outletId, date])
+  @@map("inventory")
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  productId   String   @map("product_id")
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Decimal  @db.Decimal(10, 2)
+  date        DateTime @db.Date
+  enteredById String   @map("entered_by")
+  enteredBy   User     @relation(fields: [enteredById], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("purchases")
+}
+
+model Sale {
+  id        String   @id @default(cuid())
+  outletId  String   @map("outlet_id")
+  outlet    Outlet   @relation(fields: [outletId], references: [id])
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Decimal  @db.Decimal(10, 2)
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("sales")
+}
+
+model Waste {
+  id        String   @id @default(cuid())
+  outletId  String   @map("outlet_id")
+  outlet    Outlet   @relation(fields: [outletId], references: [id])
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Decimal  @db.Decimal(10, 2)
+  imageUrl  String?  @map("image_url")
+  reason    String?
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("waste")
+}
+
+model DailyClosing {
+  id        String   @id @default(cuid())
+  outletId  String   @map("outlet_id")
+  outlet    Outlet   @relation(fields: [outletId], references: [id])
+  cardSales Decimal  @map("card_sales") @db.Decimal(10, 2)
+  cashSales Decimal  @map("cash_sales") @db.Decimal(10, 2)
+  netCash   Decimal  @map("net_cash") @db.Decimal(10, 2)
+  date      DateTime @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([outletId, date])
+  @@map("daily_closing")
+}
