@@ -1,9 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react';
 import Layout from '../../components/Layout';
+import { useTranslations } from '../../hooks/useLanguage';
 import { getDailyClosing, createDailyClosing } from '../../lib/api';
 import type { DailyClosing } from '../../types';
 
 export default function OutletDailyClosing() {
+  const t = useTranslations();
   const [closings, setClosings] = useState<DailyClosing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export default function OutletDailyClosing() {
         setClosings(response.data as DailyClosing[]);
       }
     } catch {
-      setError('Failed to load data');
+      setError(t.messages.error);
     } finally {
       setLoading(false);
     }
@@ -49,10 +51,10 @@ export default function OutletDailyClosing() {
         setFormData({ cardSales: '', cashSales: '', date: new Date().toISOString().split('T')[0] });
         fetchData();
       } else {
-        setError(response.error || 'Failed to submit closing');
+        setError(response.error || t.messages.error);
       }
     } catch {
-      setError('Failed to submit closing');
+      setError(t.messages.error);
     } finally {
       setSubmitting(false);
     }
@@ -65,12 +67,12 @@ export default function OutletDailyClosing() {
     <Layout>
       <div className="px-4 py-6 sm:px-0">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Daily Closing</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t.pages.dailyClosing.title}</h1>
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
-            {showForm ? 'Cancel' : 'New Closing'}
+            {showForm ? t.actions.cancel : t.pages.dailyClosing.submitClosing}
           </button>
         </div>
 
@@ -78,10 +80,10 @@ export default function OutletDailyClosing() {
 
         {showForm && (
           <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-medium mb-4">Submit Daily Closing</h2>
+            <h2 className="text-lg font-medium mb-4">{t.pages.dailyClosing.submitClosing}</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.labels.date}</label>
                 <input
                   type="date"
                   value={formData.date}
@@ -91,7 +93,7 @@ export default function OutletDailyClosing() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Card Sales</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.closing.cardSales}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -104,7 +106,7 @@ export default function OutletDailyClosing() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cash Sales</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.closing.cashSales}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -117,8 +119,8 @@ export default function OutletDailyClosing() {
                 />
               </div>
               <div className="bg-gray-50 p-4 rounded-md">
-                <p className="text-sm text-gray-600">Total Sales: <span className="font-bold">{totalSales.toFixed(2)}</span></p>
-                <p className="text-sm text-gray-600">Net Cash: <span className="font-bold">{netCash.toFixed(2)}</span></p>
+                <p className="text-sm text-gray-600">{t.pages.sales.totalSales}: <span className="font-bold">{totalSales.toFixed(2)}</span></p>
+                <p className="text-sm text-gray-600">{t.closing.netCash}: <span className="font-bold">{netCash.toFixed(2)}</span></p>
               </div>
               <div className="md:col-span-2">
                 <button
@@ -126,30 +128,30 @@ export default function OutletDailyClosing() {
                   disabled={submitting}
                   className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50"
                 >
-                  {submitting ? 'Submitting...' : 'Submit Closing'}
+                  {submitting ? t.labels.loading : t.actions.submit}
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {loading && <p className="text-gray-500">Loading...</p>}
+        {loading && <p className="text-gray-500">{t.labels.loading}</p>}
 
         {!loading && (
           <div className="bg-white shadow overflow-hidden rounded-lg">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Card Sales</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cash Sales</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Net Cash</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t.labels.date}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t.closing.cardSales}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t.closing.cashSales}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t.closing.netCash}</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {closings.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">No closing records</td>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">{t.labels.noData}</td>
                   </tr>
                 ) : (
                   closings.map((closing) => (

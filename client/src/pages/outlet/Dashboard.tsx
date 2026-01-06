@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslations } from '../../hooks/useLanguage';
 import Layout from '../../components/Layout';
 
 export default function OutletDashboard() {
   const { user } = useAuth();
+  const t = useTranslations();
 
   const quickActions = [
-    { to: '/outlet/sales', label: 'Record Sale', icon: '💰', color: 'from-emerald-500 to-teal-600', desc: 'Add new sales records' },
-    { to: '/outlet/waste', label: 'Record Waste', icon: '🗑️', color: 'from-red-500 to-rose-600', desc: 'Log waste items' },
-    { to: '/outlet/closing', label: 'Daily Closing', icon: '📋', color: 'from-blue-500 to-indigo-600', desc: 'Submit daily report' },
+    { to: '/outlet/sales', label: t.pages.sales.recordSale, icon: '💰', color: 'from-emerald-500 to-teal-600', desc: t.pages.sales.subtitle },
+    { to: '/outlet/waste', label: t.pages.waste.recordWaste, icon: '🗑️', color: 'from-red-500 to-rose-600', desc: t.pages.waste.subtitle },
+    { to: '/outlet/closing', label: t.nav.dailyClosing, icon: '📋', color: 'from-blue-500 to-indigo-600', desc: t.pages.dailyClosing.subtitle },
   ];
 
   return (
@@ -16,10 +18,10 @@ export default function OutletDashboard() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800">
-          Welcome, {user?.name?.split(' ')[0]}
+          {t.pages.dashboard.welcome}, {user?.name?.split(' ')[0]}
         </h1>
         <p className="text-slate-500 mt-1">
-          {user?.outlet?.name ? `Managing ${user.outlet.name}` : 'Outlet Dashboard'}
+          {user?.outlet?.name ? `${user.outlet.name}` : t.nav.dashboard}
         </p>
       </div>
 
@@ -34,7 +36,7 @@ export default function OutletDashboard() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">{user.outlet.name}</h2>
-              <p className="text-indigo-200">Active Outlet</p>
+              <p className="text-indigo-200">{t.labels.outlet}</p>
             </div>
           </div>
         </div>
@@ -42,7 +44,7 @@ export default function OutletDashboard() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">{t.pages.dashboard.quickActions}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickActions.map((action) => (
             <Link
@@ -67,19 +69,19 @@ export default function OutletDashboard() {
 
       {/* Today's Summary Placeholder */}
       <div className="card p-6">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">Today's Activity</h2>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">{t.labels.today}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-emerald-50">
-            <p className="text-sm text-emerald-600 font-medium">Sales Today</p>
+            <p className="text-sm text-emerald-600 font-medium">{t.nav.sales} {t.labels.today}</p>
             <p className="text-2xl font-bold text-emerald-700 mt-1">--</p>
           </div>
           <div className="p-4 rounded-xl bg-red-50">
-            <p className="text-sm text-red-600 font-medium">Waste Today</p>
+            <p className="text-sm text-red-600 font-medium">{t.nav.waste} {t.labels.today}</p>
             <p className="text-2xl font-bold text-red-700 mt-1">--</p>
           </div>
           <div className="p-4 rounded-xl bg-blue-50">
-            <p className="text-sm text-blue-600 font-medium">Closing Status</p>
-            <p className="text-2xl font-bold text-blue-700 mt-1">Pending</p>
+            <p className="text-sm text-blue-600 font-medium">{t.nav.dailyClosing}</p>
+            <p className="text-2xl font-bold text-blue-700 mt-1">--</p>
           </div>
         </div>
       </div>

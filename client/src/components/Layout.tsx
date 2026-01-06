@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage, LanguageSwitcher } from '../hooks/useLanguage';
 
 interface LayoutProps {
   children: ReactNode;
@@ -54,6 +55,7 @@ export default function Layout({ children }: LayoutProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, isRTL } = useLanguage();
 
   const handleLogout = () => {
     logout();
@@ -65,25 +67,25 @@ export default function Layout({ children }: LayoutProps) {
 
     if (user.role === 'OWNER') {
       return [
-        { to: '/admin', label: 'Dashboard', icon: Icons.Dashboard },
-        { to: '/admin/inventory', label: 'Inventory', icon: Icons.Inventory },
-        { to: '/admin/sales', label: 'Sales', icon: Icons.Sales },
-        { to: '/admin/purchases', label: 'Purchases', icon: Icons.Purchases },
-        { to: '/admin/waste', label: 'Waste', icon: Icons.Waste },
-        { to: '/admin/reports', label: 'Reports', icon: Icons.Reports },
+        { to: '/admin', label: t.nav.dashboard, icon: Icons.Dashboard },
+        { to: '/admin/inventory', label: t.nav.inventory, icon: Icons.Inventory },
+        { to: '/admin/sales', label: t.nav.sales, icon: Icons.Sales },
+        { to: '/admin/purchases', label: t.nav.purchases, icon: Icons.Purchases },
+        { to: '/admin/waste', label: t.nav.waste, icon: Icons.Waste },
+        { to: '/admin/reports', label: t.nav.reports, icon: Icons.Reports },
       ];
     } else if (user.role === 'PURCHASING') {
       return [
-        { to: '/purchasing', label: 'Dashboard', icon: Icons.Dashboard },
-        { to: '/purchasing/inventory', label: 'Inventory', icon: Icons.Inventory },
-        { to: '/purchasing/purchases', label: 'Purchases', icon: Icons.Purchases },
+        { to: '/purchasing', label: t.nav.dashboard, icon: Icons.Dashboard },
+        { to: '/purchasing/inventory', label: t.nav.inventory, icon: Icons.Inventory },
+        { to: '/purchasing/purchases', label: t.nav.purchases, icon: Icons.Purchases },
       ];
     } else {
       return [
-        { to: '/outlet', label: 'Dashboard', icon: Icons.Dashboard },
-        { to: '/outlet/sales', label: 'Sales', icon: Icons.Sales },
-        { to: '/outlet/waste', label: 'Waste', icon: Icons.Waste },
-        { to: '/outlet/closing', label: 'Daily Closing', icon: Icons.Closing },
+        { to: '/outlet', label: t.nav.dashboard, icon: Icons.Dashboard },
+        { to: '/outlet/sales', label: t.nav.sales, icon: Icons.Sales },
+        { to: '/outlet/waste', label: t.nav.waste, icon: Icons.Waste },
+        { to: '/outlet/closing', label: t.nav.dailyClosing, icon: Icons.Closing },
       ];
     }
   };
@@ -91,11 +93,11 @@ export default function Layout({ children }: LayoutProps) {
   const getRoleLabel = () => {
     if (!user) return '';
     const roleLabels: Record<string, string> = {
-      OWNER: 'Administrator',
-      PURCHASING: 'Purchasing',
-      OUTLET_CAFE: 'Cafe',
-      OUTLET_RESTAURANT: 'Restaurant',
-      OUTLET_MINI_MARKET: 'Mini Market',
+      OWNER: t.roles.owner,
+      PURCHASING: t.roles.purchasing,
+      OUTLET_CAFE: t.outlets.cafe,
+      OUTLET_RESTAURANT: t.outlets.restaurant,
+      OUTLET_MINI_MARKET: t.outlets.miniMarket,
     };
     return roleLabels[user.role] || user.role;
   };
@@ -110,20 +112,24 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-slate-100 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-e border-slate-200 flex flex-col fixed h-full">
-        {/* Logo */}
+      <aside className={`w-64 bg-white border-slate-200 flex flex-col fixed h-full ${isRTL ? "border-s right-0" : "border-e left-0"}`}>
+        {/* Logo and Language Switcher */}
         <div className="p-6 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="font-bold text-slate-800">Inventory</h1>
-              <p className="text-xs text-slate-500">Management System</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="font-bold text-slate-800">{t.nav.inventory}</h1>
+                <p className="text-xs text-slate-500">Management System</p>
+              </div>
             </div>
           </div>
+          {/* Language Switcher */}
+          <LanguageSwitcher showLabel className="w-full justify-center" />
         </div>
 
         {/* Navigation */}
@@ -164,13 +170,13 @@ export default function Layout({ children }: LayoutProps) {
             className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-200"
           >
             <Icons.Logout />
-            <span>Logout</span>
+            <span>{t.nav.logout}</span>
           </button>
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 ms-64">
+      <main className={`flex-1 ${isRTL ? "me-64" : "ms-64"}`}>
         <div className="p-8 animate-fade-in">
           {children}
         </div>
